@@ -1,0 +1,22 @@
+{
+  "name": "image-sequence",
+  "version": "1.0.0",
+  "description": "image-sequence",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "krasus"
+  },
+  "keywords": [
+    "image",
+    "sequence",
+    "image-sequence"
+  ],
+  "author": "a.esmaeeli",
+  "license": "MIT",
+  "homepage": "https://github.com/kerasus/js-model",
+  "dependencies": {}
+}

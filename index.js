@@ -1,6 +1,6 @@
 'use strict';
 
-export default CanvasAnimate = function () {
+var CanvasAnimate = function () {
 
     let sources = [];
     let frames = [];
@@ -139,3 +139,5 @@ export default CanvasAnimate = function () {
         init
     }
 }();
+
+export default CanvasAnimate

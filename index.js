@@ -82,9 +82,10 @@
         }
 
         function drawImageOnCanvas (location) {
-            if (typeof location == 'undefined') {
-                location = 0
+            if (typeof location == 'undefined' || typeof frames[location] === 'undefined') {
+                return
             }
+            context.clearRect(0, 0, canvasWidth, canvasHeight);
             context.drawImage(frames[location].image, 0, 0, canvasWidth, canvasHeight);
         }
 

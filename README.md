@@ -15,7 +15,7 @@ something like this:
     <div style="height: 2500px;"></div>
 
 
-    import CanvasAnimate from 'image-sequence'
+    import ImageSequence from 'image-sequence'
 
     const newSources = []
     const totalImages = 600
@@ -28,7 +28,7 @@ something like this:
       newSources.push(srccc)
     }
 
-    CanvasAnimate.init(document.getElementById('canvas'), 1280, 720, newSources, {
+    ImageSequence.init(document.getElementById('canvas'), 1280, 720, newSources, {
       repeat: false,
       topDelay: 0,
       bottomDelay: 0,

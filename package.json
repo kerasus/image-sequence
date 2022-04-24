@@ -1,6 +1,6 @@
 {
   "name": "image-sequence",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "image-sequence",
   "main": "index.js",
   "scripts": {

@@ -2,149 +2,151 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
         typeof define === 'function' && define.amd ? define(factory) :
             (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.ImageSequence = factory());
-}(this, (function () { 'use strict';
+}(this, (function () {
+    'use strict';
 
-    var ImageSequence = function () {
+    class ImageSequence {
+        constructor(canvasEl, w, h, newSources, newOptions) {
+            this.sources = [];
+            this.frames = [];
+            this.canvasElement = null;
+            this.currentLocation = 0;
+            this.currentFrame = 0;
+            this.playBoardPercent = 0;
+            this.context = null;
+            this.canvasHeight = null;
+            this.canvasWidth = null;
 
-        let sources = [];
-        let frames = [];
-        let canvasElement = null;
-        let currentLocation = 0;
-        let currentFrame = 0;
-        let playBoardPercent = 0;
-        let context = null;
-        let canvasHeight = null;
-        let canvasWidth = null;
+            this.options = {
+                repeat: false,
+                topDelay: 0,
+                bottomDelay: 0,
+                playSpeed: 1,
+                mouseWheelHandlerCallback: function (currentFrame, currentLocation) {
+                }
+            };
 
-        let options = {
-            repeat: false,
-            topDelay: 0,
-            bottomDelay: 0,
-            playSpeed: 1,
-            mouseWheelHandlerCallback: function (currentFrame, currentLocation) {}
-        };
-
-        function setCanvas (canvasEl, w, h) {
-            canvasElement = canvasEl;
-            canvasWidth = w;
-            canvasHeight = h;
-            canvasElement.setAttribute('width', canvasWidth)
-            canvasElement.setAttribute('height', canvasHeight)
-            context = canvasElement.getContext('2d');
+            this.setCanvas(canvasEl, w, h)
+            this.setSources(newSources)
+            this.loadFrames()
+            this.setEvents()
+            this.drawImageOnCanvas()
+            this.setOptions(newOptions)
         }
 
-        function setSources (newSources) {
-            sources = newSources
+
+        setCanvas(canvasEl, w, h) {
+            this.canvasElement = canvasEl;
+            this.canvasWidth = w;
+            this.canvasHeight = h;
+            this.canvasElement.setAttribute('width', this.canvasWidth)
+            this.canvasElement.setAttribute('height', this.canvasHeight)
+            this.context = this.canvasElement.getContext('2d');
         }
 
-        function createFrames () {
-            const sourcesCount = sources.length
+        setSources(newSources) {
+            this.sources = newSources
+        }
+
+        createFrames() {
+            const sourcesCount = this.sources.length
             for (let i = 0; i < sourcesCount; i++) {
-                frames.push({
+                this.frames.push({
                     image: new Image,
-                    src: sources[i]
+                    src: this.sources[i]
                 });
             }
         }
 
-        function getLoadFrameTempo () {
-            const tempo = parseInt(Math.atan(sources.length/100)*8)
+        getLoadFrameTempo() {
+            const tempo = parseInt(Math.atan(this.sources.length / 100) * 8)
             if (tempo > 0) {
                 return tempo
             }
             return 1
         }
 
-        function loadFrameSource (location) {
-            frames[location].image.src = frames[location].src
+        loadFrameSource(location) {
+            this.frames[location].image.src = this.frames[location].src
         }
 
-        function loadSomeFrames () {
-            const sourcesCount = sources.length
-            for (let i = 0; i < sourcesCount; i = i + getLoadFrameTempo()) {
-                loadFrameSource(i)
+        loadSomeFrames() {
+            const sourcesCount = this.sources.length
+            for (let i = 0; i < sourcesCount; i = i + this.getLoadFrameTempo()) {
+                this.loadFrameSource(i)
             }
         }
 
-        function loadAllFrames () {
-            const sourcesCount = sources.length
+        loadAllFrames() {
+            const sourcesCount = this.sources.length
             for (let i = 0; i < sourcesCount; i++) {
-                if (!frames[i].image.src) {
-                    loadFrameSource(i)
+                if (!this.frames[i].image.src) {
+                    this.loadFrameSource(i)
                 }
             }
         }
 
-        function loadFrames () {
-            createFrames()
-            loadSomeFrames()
-            loadAllFrames()
+        loadFrames() {
+            this.createFrames()
+            this.loadSomeFrames()
+            this.loadAllFrames()
         }
 
-        function drawImageOnCanvas (location) {
-            if (typeof location == 'undefined' || typeof frames[location] === 'undefined') {
-                return
+        drawImageOnCanvas(location) {
+            if (typeof location == 'undefined' || typeof this.frames[location] === 'undefined') {
+                console.log('location', location)
+                console.log('this.frames', this.frames)
+                console.log('this.frames[location]', this.frames[location])
+                location = 0
             }
-            context.clearRect(0, 0, canvasWidth, canvasHeight);
-            context.drawImage(frames[location].image, 0, 0, canvasWidth, canvasHeight);
+            this.context.drawImage(this.frames[location].image, 0, 0, this.canvasWidth, this.canvasHeight);
         }
 
-        function scrollHandler (e) {
+        scrollHandler(e) {
             const windowHeight = (window.innerHeight || document.documentElement.clientHeight)
-            const boundingClientRect = canvasElement.getBoundingClientRect()
-            if (boundingClientRect.top + options.bottomDelay >= windowHeight) {
+            const boundingClientRect = this.canvasElement.getBoundingClientRect()
+            if (boundingClientRect.top + this.options.bottomDelay >= windowHeight) {
                 return
             }
-            if (boundingClientRect.bottom - options.topDelay < 0) {
+            if (boundingClientRect.bottom - this.options.topDelay < 0) {
                 return
             }
 
             const newPlayBoardPercent = (windowHeight + boundingClientRect.height - boundingClientRect.bottom) * 100 / (windowHeight + boundingClientRect.height)
-            const playBoardPercentDiff = newPlayBoardPercent - playBoardPercent
-            playBoardPercent = newPlayBoardPercent
-            currentLocation += playBoardPercentDiff * options.playSpeed;
-            if (currentLocation < 0) {
-                if (!options.repeat) {
-                    currentLocation = 0;
+            const playBoardPercentDiff = newPlayBoardPercent - this.playBoardPercent
+            this.playBoardPercent = newPlayBoardPercent
+            this.currentLocation += playBoardPercentDiff * this.options.playSpeed;
+            if (this.currentLocation < 0) {
+                if (!this.options.repeat) {
+                    this.currentLocation = 0;
                 } else {
-                    currentLocation = frames.length - 1;
+                    this.currentLocation = this.frames.length - 1;
                 }
             }
-            if (currentLocation >= frames.length) {
-                if (!options.repeat) {
-                    currentLocation = frames.length - 1;
+            if (this.currentLocation >= this.frames.length) {
+                if (!this.options.repeat) {
+                    this.currentLocation = this.frames.length - 1;
                 } else {
-                    currentLocation = 0;
+                    this.currentLocation = 0;
                 }
             }
 
-            currentFrame = Math.round(currentLocation)
-            drawImageOnCanvas(currentFrame);
-            options.mouseWheelHandlerCallback(currentFrame, currentLocation);
+            this.currentFrame = Math.round(this.currentLocation)
+            this.drawImageOnCanvas(this.currentFrame);
+            this.options.mouseWheelHandlerCallback(this.currentFrame, this.currentLocation);
         }
 
-        function setEvents () {
-            window.addEventListener('scroll', scrollHandler, false);
+        setEvents() {
+            window.addEventListener('scroll', (e) => {
+                this.scrollHandler(e)
+            }, false);
         }
 
-        function setOptions (newOptions) {
-            Object.assign(options, newOptions)
+        setOptions(newOptions) {
+            Object.assign(this.options, newOptions)
         }
 
-        function init (canvasEl, w, h, newSources, newOptions) {
-            setCanvas(canvasEl, w, h)
-            setSources(newSources)
-            loadFrames()
-            setEvents()
-            drawImageOnCanvas()
-            setOptions(newOptions)
-        }
-
-        return {
-            init
-        }
-    }();
-
+    }
     return ImageSequence;
 
 })));

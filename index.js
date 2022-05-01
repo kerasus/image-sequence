@@ -94,12 +94,16 @@
 
         drawImageOnCanvas(location) {
             if (typeof location == 'undefined' || typeof this.frames[location] === 'undefined') {
-                console.log('location', location)
-                console.log('this.frames', this.frames)
-                console.log('this.frames[location]', this.frames[location])
                 location = 0
             }
+
+            // this.frames[location].image.onload = () => {
+            //     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+            //     this.context.drawImage(this.frames[location].image, 0, 0, this.canvasWidth, this.canvasHeight);
+            // };
+            this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
             this.context.drawImage(this.frames[location].image, 0, 0, this.canvasWidth, this.canvasHeight);
+
         }
 
         scrollHandler(e) {
@@ -112,7 +116,7 @@
                 return
             }
 
-            const newPlayBoardPercent = (windowHeight + boundingClientRect.height - boundingClientRect.bottom) * 100 / (windowHeight + boundingClientRect.height)
+            const newPlayBoardPercent = (windowHeight + boundingClientRect.height - boundingClientRect.bottom - this.options.bottomDelay) * 100 / (windowHeight + boundingClientRect.height)
             const playBoardPercentDiff = newPlayBoardPercent - this.playBoardPercent
             this.playBoardPercent = newPlayBoardPercent
             this.currentLocation += playBoardPercentDiff * this.options.playSpeed;
